@@ -8,7 +8,7 @@ import java.util.Objects;
  * @author: Geekye
  * @create: 2018-12-03 17:00
  **/
-public class ShoesEntity {
+public class ShoeEntity {
 
     /**
      * inWallContentCard : false
@@ -318,7 +318,7 @@ public class ShoesEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShoesEntity that = (ShoesEntity) o;
+        ShoeEntity that = (ShoeEntity) o;
         return rawPrice == that.rawPrice &&
                 nikeid == that.nikeid &&
                 nikeIdPremiumImage == that.nikeIdPremiumImage &&
@@ -336,5 +336,40 @@ public class ShoesEntity {
     public int hashCode() {
 
         return Objects.hash(rawPrice, localPrice, overriddenLocalPrice, employeePrice, overriddenEmployeePrice, title, subtitle, nikeid, nikeIdPremiumImage, pdpUrl, spriteSheet);
+    }
+
+    @Override
+    public String toString() {
+        return "ShoeEntity{" +
+                "inWallContentCard=" + inWallContentCard +
+                ", rawPrice=" + rawPrice +
+                ", localPrice='" + localPrice + '\'' +
+                ", overriddenLocalPrice='" + overriddenLocalPrice + '\'' +
+                ", employeePrice='" + employeePrice + '\'' +
+                ", overriddenEmployeePrice='" + overriddenEmployeePrice + '\'' +
+                ", title='" + title + '\'' +
+                ", subtitle='" + subtitle + '\'' +
+                ", nikeid=" + nikeid +
+                ", nikeIdPremiumImage=" + nikeIdPremiumImage +
+                ", nfl=" + nfl +
+                ", nba=" + nba +
+                ", jersey=" + jersey +
+                ", playerNamesAvailable=" + playerNamesAvailable +
+                ", widthsAvailable=" + widthsAvailable +
+                ", inStock=" + inStock +
+                ", comingSoon=" + comingSoon +
+                ", preorder=" + preorder +
+                ", pdpUrl='" + pdpUrl + '\'' +
+                ", spriteSheet='" + spriteSheet + '\'' +
+                ", fullSize=" + fullSize +
+                ", numberOfColors=" + numberOfColors +
+                ", showNumberOfColors=" + showNumberOfColors +
+                ", itemIndex=" + itemIndex +
+                ", showColorways=" + showColorways +
+                ", showReviews=" + showReviews +
+                ", showPrice=" + showPrice +
+                ", gridType='" + gridType + '\'' +
+                ", customizable=" + customizable +
+                '}';
     }
 }
