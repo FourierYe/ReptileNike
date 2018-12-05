@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.nike.reptile.constant.URLConstant;
 import com.nike.reptile.entity.ShoeEntity;
 import com.nike.reptile.util.HttpUtil;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -39,7 +41,7 @@ public class ReptileUtil {
     }
 
     public static void main(String[] args) {
-        List<ShoeEntity> shoes = new ReptileUtil().getNikeResource(URLConstant.NIKE_MAN_URL, 1);
+        List<ShoeEntity> shoes = new ReptileUtil().getNikeResource(URLConstant.NIKE_MAN_URL, 0);
         int i = 0;
         Set set = new HashSet();
         for (ShoeEntity shoe : shoes
