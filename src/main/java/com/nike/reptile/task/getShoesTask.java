@@ -7,6 +7,8 @@ import com.nike.reptile.service.WomanShoesService;
 import com.nike.reptile.service.serviceImpl.BigBoyServiceImpl;
 import com.nike.reptile.service.serviceImpl.ManShoesServiceImpl;
 import com.nike.reptile.service.serviceImpl.WomanShoesServiceImpl;
+import com.nike.reptile.util.EmailUtil;
+import com.nike.reptile.util.IPUtil;
 import com.nike.reptile.util.ReadAndWriteUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -45,6 +47,9 @@ public class getShoesTask implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
 
+        //更换有效IP地址
+        new IPUtil().getValidIP();
+
         //获取总的鞋子实体类List
         List<ShoeEntity> shoesResult = getShoeEntities();
 
@@ -64,14 +69,14 @@ public class getShoesTask implements ApplicationRunner {
         List<String> localtionHashList = new ReadAndWriteUtil().readFileIntoList();
         localtionHashSet.addAll(localtionHashList);
 
-        //每1个小时调用该schedule,通知用户，追加数据
+        //每10分钟调用该schedule,通知用户，追加数据
         scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> noticeTask(),
                 0L,
                 1000L * 60 * 10,
                 TimeUnit.MILLISECONDS);
     }
 
-
+    //通知
     private void noticeTask() {
 
         System.out.println("开始监控任务，noticeTask运行！");
@@ -80,19 +85,39 @@ public class getShoesTask implements ApplicationRunner {
 
         //临时存放新上线鞋的HashList
         List<String> shoeHashListTemp = new ArrayList<>();
+        //临时存放新上线鞋的List
+        List<ShoeEntity> shoeEntities = new ArrayList<>();
         for (ShoeEntity shoe : shoesResult
                 ) {
             //是否存在LocaltionHashSet中
             boolean flag = localtionHashSet.add(String.valueOf(shoe.hashCode()));
             if (flag) {
-                //通知
-
                 //将Hash追加到临时存放新上线鞋的HashList
                 shoeHashListTemp.add(String.valueOf(shoe.hashCode()));
+                shoeEntities.add(shoe);
             }
         }
-        //将临时存放新上线鞋的HashList追加到到本地文件中
-        new ReadAndWriteUtil().writeListIntoFileByAppend(shoeHashListTemp);
+
+        if (shoeHashListTemp.size() >= 1) {
+            //通知
+            try {
+                threadPoolExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new EmailUtil().sendEmail("有新款上线了！如下:"+shoeEntities.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //将临时存放新上线鞋的HashList追加到到本地文件中
+            new ReadAndWriteUtil().writeListIntoFileByAppend(shoeHashListTemp);
+        }
     }
 
     private List<String> listShoesHashCode(List<ShoeEntity> shoesResult) {

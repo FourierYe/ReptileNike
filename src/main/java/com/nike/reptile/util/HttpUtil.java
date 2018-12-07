@@ -120,4 +120,25 @@ public class HttpUtil {
         return result;
     }
 
+
+    public static void main(String[] args) {
+        System.setProperty("http.maxRedirects", "50");
+        System.getProperties().setProperty("proxySet", "true");
+        // 如果不设置，只要代理IP和代理端口正确,此项不设置也可以
+        String ip = "93.91.200.146";
+//        ip = "221.130.18.5";
+//        ip = "221.130.23.135";
+//        ip = "221.130.18.78";
+//        ip = "221.130.23.134";
+//        ip = "221.130.18.49";
+//        ip = "111.1.32.36";
+//        ip = "221.130.18.49";
+//        ip = "221.130.18.49";
+        System.getProperties().setProperty("http.proxyHost", ip);
+        System.getProperties().setProperty("http.proxyPort", "80");
+
+        //确定代理是否设置成功
+        String result = sendGet("https://store.nike.com/html-services/gridwallData?country=CN&lang_locale=zh_CN&gridwallPath=mens-shoes/7puZoi3&pn=2");
+        System.out.println(result);
+    }
 }
