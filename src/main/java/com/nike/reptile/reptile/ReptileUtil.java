@@ -41,16 +41,22 @@ public class ReptileUtil {
     }
 
     public static void main(String[] args) {
-        List<ShoeEntity> shoes = new ReptileUtil().getNikeResource(URLConstant.NIKE_MAN_URL, 0);
-        int i = 0;
-        Set set = new HashSet();
-        for (ShoeEntity shoe : shoes
-                ) {
-            Boolean flag = set.add(shoe.hashCode());
-            System.out.println("flag：" + flag + ".hashcode:" + shoe.hashCode());
-            i++;
-        }
 
-        System.out.println("该页有多少鞋：" + i + "个！");
+        Set set = new HashSet();
+        set.addAll(Arrays.asList(1,2));
+        System.out.println(set.add(3));
+//        List<ShoeEntity> shoes = new ReptileUtil().getNikeResource(URLConstant.NIKE_MAN_URL, 0);
+//        int i = 0;
+//        Set set = new HashSet();
+//        for (ShoeEntity shoe : shoes
+//                ) {
+//            Boolean flag = set.add(shoe.hashCode());
+//            System.out.println("flag：" + flag + ".hashcode:" + shoe.hashCode());
+//            i++;
+//        }
+//
+//        System.out.println("该页有多少鞋：" + i + "个！");
+
+
     }
 }

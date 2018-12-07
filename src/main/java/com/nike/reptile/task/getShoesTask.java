@@ -13,10 +13,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -29,15 +27,84 @@ import java.util.concurrent.*;
 @Order(value = 2)
 public class getShoesTask implements ApplicationRunner {
 
+    //用于鞋对比的Hash集合
+    private Set<String> localtionHashSet = new HashSet<>();
+
     /**
-     * 线程池
+     * 获取数据的线程池
      */
     private ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 20,
             2000L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(1024));
 
+    /**
+     * 任务周期调用的scheduleThreadPool
+     */
+    private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+
+
     @Override
     public void run(ApplicationArguments args) {
 
+        //获取总的鞋子实体类List
+        List<ShoeEntity> shoesResult = getShoeEntities();
+
+        //统计鞋子的数量
+        countShoesNum(shoesResult);
+
+        //获取shoesList的Hashcode
+        List<String> shoesHash = listShoesHashCode(shoesResult);
+
+        File fileName = new File("./ShoesHash.txt");
+
+        if (!fileName.exists()) {
+            //如果本地没有文件，则将ListHash存到本地
+            new ReadAndWriteUtil().writeListIntoFile(shoesHash);
+        }
+        //则本地文件存的Hash存到Set中
+        List<String> localtionHashList = new ReadAndWriteUtil().readFileIntoList();
+        localtionHashSet.addAll(localtionHashList);
+
+        //每1个小时调用该schedule,通知用户，追加数据
+        scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> noticeTask(),
+                0L,
+                1000L * 60 * 10,
+                TimeUnit.MILLISECONDS);
+    }
+
+
+    private void noticeTask() {
+
+        System.out.println("开始监控任务，noticeTask运行！");
+        //获取总的鞋子实体类List
+        List<ShoeEntity> shoesResult = getShoeEntities();
+
+        //临时存放新上线鞋的HashList
+        List<String> shoeHashListTemp = new ArrayList<>();
+        for (ShoeEntity shoe : shoesResult
+                ) {
+            //是否存在LocaltionHashSet中
+            boolean flag = localtionHashSet.add(String.valueOf(shoe.hashCode()));
+            if (flag) {
+                //通知
+
+                //将Hash追加到临时存放新上线鞋的HashList
+                shoeHashListTemp.add(String.valueOf(shoe.hashCode()));
+            }
+        }
+        //将临时存放新上线鞋的HashList追加到到本地文件中
+        new ReadAndWriteUtil().writeListIntoFileByAppend(shoeHashListTemp);
+    }
+
+    private List<String> listShoesHashCode(List<ShoeEntity> shoesResult) {
+        List<String> shoesHash = new ArrayList<>();
+        for (ShoeEntity shoe : shoesResult
+                ) {
+            shoesHash.add(String.valueOf(shoe.hashCode()));
+        }
+        return shoesHash;
+    }
+
+    private List<ShoeEntity> getShoeEntities() {
         Map<String, Future<List<ShoeEntity>>> futureMap = new HashMap();
         List<ShoeEntity> shoesResult = new ArrayList<>();
         //获取大童鞋的List并放到FutureMap中
@@ -47,11 +114,11 @@ public class getShoesTask implements ApplicationRunner {
         //获取女人鞋的List并放到FutureMap中
         setWomanIntoFutureMap(futureMap);
 
-        for (String key:futureMap.keySet()
-             ) {
+        for (String key : futureMap.keySet()
+                ) {
             Future<List<ShoeEntity>> shoeFuture = futureMap.get(key);
             try {
-                List<ShoeEntity> shoes = shoeFuture.get(3000L, TimeUnit.MILLISECONDS);
+                List<ShoeEntity> shoes = shoeFuture.get(8000L, TimeUnit.MILLISECONDS);
                 shoesResult.addAll(shoes);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -61,18 +128,18 @@ public class getShoesTask implements ApplicationRunner {
                 e.printStackTrace();
             }
         }
+        return shoesResult;
+    }
 
+    private void countShoesNum(List<ShoeEntity> shoesResult) {
         int count = 0;
-        for (ShoeEntity shoe:shoesResult
-             ) {
+        for (ShoeEntity shoe : shoesResult
+                ) {
             count++;
             System.out.println(shoe.toString());
         }
 
-        System.out.println("总共"+count+"双鞋！");
-//        new ReadAndWriteUtil().writeListIntoFile(shoesHash);
-//        System.out.println("总共男鞋：" + count + "双！");
-//        System.out.println("总共大童鞋："+count+"双！");
+        System.out.println("总共" + count + "双鞋！");
     }
 
     private void setWomanIntoFutureMap(Map<String, Future<List<ShoeEntity>>> futureMap) {

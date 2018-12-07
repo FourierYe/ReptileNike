@@ -2,6 +2,7 @@ package com.nike.reptile.util;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public class ReadAndWriteUtil {
     private File file = new File("./ShoesHash.txt");
 
     /**
-     * 将List写入到文件中
+     * 将List写入到文件中,覆盖模式
      */
     public void writeListIntoFile(List<String> list) {
 
@@ -23,13 +24,13 @@ public class ReadAndWriteUtil {
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file);
-            for (String str:list
-                 ) {
-                fileWriter.append(str+"\r\n");
+            for (String str : list
+                    ) {
+                fileWriter.append(str + "\r\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
                 fileWriter.close();
             } catch (IOException e) {
@@ -41,24 +42,48 @@ public class ReadAndWriteUtil {
 
 
     /**
-     * 将文件数据读到List中
-     *
+     * 将List写入到文件中,追加模式
      */
-    public List<String> readFileIntoList(){
+    public void writeListIntoFileByAppend(List<String> list) {
+
+        System.out.println(file.getAbsolutePath());
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(file, true);
+            for (String str : list
+                    ) {
+                fileWriter.append(str + "\r\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * 将文件数据读到List中
+     */
+    public List<String> readFileIntoList() {
 
         List<String> list = new ArrayList<>();
         BufferedReader bufferedReader = null;
         try {
             bufferedReader = new BufferedReader(new FileReader(file));
-            String line ;
-            while ((line = bufferedReader.readLine() )!= null) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
                 list.add(line);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
                 bufferedReader.close();
             } catch (IOException e) {
@@ -69,7 +94,9 @@ public class ReadAndWriteUtil {
     }
 
     public static void main(String[] args) {
-        File file = new File("./123.txt");
-        System.out.println(file.exists());
+//        File file = new File("./123.txt");
+//        System.out.println(file.exists());
+        List<String> test = Arrays.asList("1231231dad", "31314rwrq");
+        new ReadAndWriteUtil().writeListIntoFile(test);
     }
 }
