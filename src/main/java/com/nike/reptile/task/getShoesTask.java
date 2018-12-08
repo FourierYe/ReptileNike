@@ -69,10 +69,10 @@ public class getShoesTask implements ApplicationRunner {
         List<String> localtionHashList = new ReadAndWriteUtil().readFileIntoList();
         localtionHashSet.addAll(localtionHashList);
 
-        //每10分钟调用该schedule,通知用户，追加数据
+        //每120分钟调用该schedule,通知用户，追加数据
         scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> noticeTask(),
                 0L,
-                1000L * 60 * 10,
+                1000L * 60 * 60 * 2,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -105,7 +105,7 @@ public class getShoesTask implements ApplicationRunner {
                     @Override
                     public void run() {
                         try {
-                            new EmailUtil().sendEmail("有新款上线了！如下:"+shoeEntities.toString());
+                            new EmailUtil().sendEmail("有新款上线了！如下:" + shoeEntities.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

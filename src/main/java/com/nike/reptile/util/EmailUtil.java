@@ -1,12 +1,16 @@
 package com.nike.reptile.util;
 
+import com.nike.reptile.entity.ShoeEntity;
+
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -120,4 +124,41 @@ public class EmailUtil {
         transport.close();
 
     }
+
+    public void sendEmailByListShoes(List<ShoeEntity> shoes) throws Exception {
+
+        StringBuilder sendContent = new StringBuilder();
+        sendContent.append("有新款上线了！一共有" + shoes.size()+"双鞋新上线!<br>"+
+                "如下:<br>");
+        for (ShoeEntity shoe:shoes
+             ) {
+            sendContent.append("款式名字："+shoe.getSubtitle()+","+shoe.getTitle()+";<br>"+
+            "金额："+"原价"+shoe.getRawPrice()+",员工价："+shoe.getEmployeePrice()+";<br>"+
+            "连接地址：<a href=\""+shoe.getPdpUrl()+"\">"+shoe.getPdpUrl()+"</a>"+"<br>");
+            sendContent.append("<br>");
+        }
+        sendEmail(sendContent.toString());
+    }
+
+    public static void main(String[] args) throws Exception {
+        List<ShoeEntity> shoeEntities = new ArrayList<>();
+        ShoeEntity shoeEntity = new ShoeEntity();
+        shoeEntity.setSubtitle("男子篮球鞋");
+        shoeEntity.setTitle("Kyrie 5 EP");
+        shoeEntity.setRawPrice(999);
+        shoeEntity.setEmployeePrice("999");
+        shoeEntity.setPdpUrl("https://www.nike.com/cn/t/kyrie-5-ep-%E7%94%B7%E5%AD%90%E7%AF%AE%E7%90%83%E9%9E%8B-ZnB7SP");
+        shoeEntities.add(shoeEntity);
+
+        ShoeEntity shoeEntity1 = new ShoeEntity();
+        shoeEntity1.setSubtitle("男子篮球鞋");
+        shoeEntity1.setTitle("Kyrie Low EP");
+        shoeEntity1.setRawPrice(899);
+        shoeEntity1.setEmployeePrice("539");
+        shoeEntity1.setPdpUrl("https://www.nike.com/cn/t/kyrie-low-ep-%E7%94%B7%E5%AD%90%E7%AF%AE%E7%90%83%E9%9E%8B-sfTb83");
+        shoeEntities.add(shoeEntity1);
+
+        new EmailUtil().sendEmailByListShoes(shoeEntities);
+    }
+
 }
