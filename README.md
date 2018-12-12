@@ -1,4 +1,4 @@
 # ReptileNike
-- The repository that reptile Nike shoes.
+- The repository is a reptile that gets new Nike shoes.
 - It is a joy made for my friend.
-- I will very happy if you star or fork this project.
+- I will be very happy if you star or fork this project.
